@@ -1,5 +1,7 @@
 
 from copy import deepcopy
+from math import gcd
+import itertools
 
 position = {
     0: (10, 15, 7),
@@ -37,20 +39,18 @@ def dimensions(p, v):
 
 origdimensions = dimensions(position, velocity)
 
-loops = 1000000
+loopsizes = {}
 
-for loop in range(loops):
+for loop in itertools.count():
 
     dim = dimensions(position, velocity)
 
-    if dim[0] == origdimensions[0] and loop > 0:
-        print ("dim0", loop, dim[0])
+    for d in range(3):
+        if dim[d] == origdimensions[d] and loop > 0:
+            loopsizes.setdefault(d, loop)
 
-    if dim[1] == origdimensions[1] and loop > 0:
-        print ("dim1", loop, dim[2])
-
-    if dim[2] == origdimensions[2] and loop > 0:
-        print ("dim2", loop, dim[2])
+    if len(loopsizes) == 3:
+        break
 
     # Gravity
     posdiffs = {}
@@ -75,17 +75,19 @@ for loop in range(loops):
     for m in range(4):
         position[m] = tuple([sum(x) for x in zip(position[m], velocity[m])])
 
-def mul(*x):
-    v = 1
-    for i in x:
-        v = v*i
-    return v
+    if loop == 1000-1:
+        result = 0
+        for m in range(4):
+            result += sum([abs(x) for x in position[m]]) * sum([abs(x) for x in velocity[m]])
 
-result = 0
-for m in range(4):
-    result += mul(
-        sum([abs(x) for x in position[m]]),
-        sum([abs(x) for x in velocity[m]])
-    )
+        print(result)
 
-print(result)
+print(loopsizes)
+
+def lcm(a, b):
+    return a * b // gcd(a, b)
+
+ls = tuple(loopsizes.values())
+
+print(ls[0]*ls[1]*ls[2])
+print(lcm(ls[0], lcm(ls[1], ls[2])))
