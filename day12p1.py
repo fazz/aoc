@@ -4,10 +4,10 @@ from math import gcd
 import itertools
 
 position = {
-    0: (10, 15, 7),
-    1: (15, 10, 0),
-    2: (20, 12, 3),
-    3: (0, -3, 13)
+    0: [10, 15, 7],
+    1: [15, 10, 0],
+    2: [20, 12, 3],
+    3: [0, -3, 13]
 }
 
 position2 = {
@@ -17,63 +17,60 @@ position2 = {
     3: (3, 5, -1)
 }
 
+# Priit
+position3 = {
+    0: (1, 4, 4),
+    1: (-4, -1, 19),
+    2: (-15, -14, 12),
+    3: (-17, 1, 10)
+}
+
 velocity = {
-    0: (0, 0, 0),
-    1: (0, 0, 0),
-    2: (0, 0, 0),
-    3: (0, 0, 0)
+    0: [0, 0, 0],
+    1: [0, 0, 0],
+    2: [0, 0, 0],
+    3: [0, 0, 0]
 }
 
 origposition = deepcopy(position)
 origvelocity = deepcopy(velocity)
 
-def dimensions(p, v):
-    result = {}
-    for a in range(3):
+loopsizes = []
 
-        d = tuple([p[m][a] for m in range(4)] + [v[m][a] for m in range(4)])
+unfound = set([0,1,2])
 
-        result[a] = d
-
-    return result
-
-origdimensions = dimensions(position, velocity)
-
-loopsizes = {}
+def sign(a, b):
+    return (b-a) // (abs(b-a)) if a != b else 0
 
 for loop in itertools.count():
 
-    dim = dimensions(position, velocity)
-
-    for d in range(3):
-        if dim[d] == origdimensions[d] and loop > 0:
-            loopsizes.setdefault(d, loop)
+    remove = set()
+    for d in unfound:
+        if velocity[0][d] == 0:
+            if tuple([v[d] for v in velocity.values()]) == (0,0,0,0) and loop > 0:
+                print(position, velocity)
+                loopsizes.append(loop)
+                remove.add(d)
+    
+    for r in sorted(remove, reverse = True):
+        for k in position.keys():
+            velocity[k].pop(r)
+            position[k].pop(r)
+        unfound.remove(max(unfound))
 
     if len(loopsizes) == 3:
         break
 
-    # Gravity
-    posdiffs = {}
+    # Velocity
     for moon in range(4):
         for moon2 in range(moon+1, 4):
-            # for moon
-            diff = []
-            for c in zip(position[moon], position[moon2]):
-                d = 0
-                if c[1] != c[0]:
-                    d = (c[1]-c[0]) // (abs(c[1]-c[0]))
-                diff.append(d)
-            posdiffs.setdefault(moon, {})[moon2] = tuple(diff)
-            posdiffs.setdefault(moon2, {})[moon] = tuple([-x for x in diff])
-
-    # Velocity
-    for m in posdiffs.keys():
-        v = tuple([sum(x) for x in zip(velocity[m], *posdiffs[m].values())])
-        velocity[m] = v
+            diff = [sign(c[0], c[1]) for c in zip(position[moon], position[moon2])]
+            velocity[moon] = [d[0] + d[1] for d in zip(velocity[moon], diff)]
+            velocity[moon2] = [d[0] - d[1] for d in zip(velocity[moon2], diff)]
 
     # Position
     for m in range(4):
-        position[m] = tuple([sum(x) for x in zip(position[m], velocity[m])])
+        position[m] = [sum(x) for x in zip(position[m], velocity[m])]
 
     if loop == 1000-1:
         result = 0
@@ -87,7 +84,7 @@ print(loopsizes)
 def lcm(a, b):
     return a * b // gcd(a, b)
 
-ls = tuple(loopsizes.values())
+ls = loopsizes
 
 print(ls[0]*ls[1]*ls[2])
-print(lcm(ls[0], lcm(ls[1], ls[2])))
+#print(lcm(ls[0], lcm(ls[1], ls[2])))
