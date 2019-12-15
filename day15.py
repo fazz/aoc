@@ -137,9 +137,6 @@ inputprogram='3,1033,1008,1033,1,1032,1005,1032,31,1008,1033,2,1032,1005,1032,58
 
 origmemory = [int(x) for x in inputprogram.split(',')]
 
-area = {}
-area.setdefault(0, {})[0] = ('.', 0)
-
 change = {
     1: (0, -1),
     2: (0, 1),
@@ -154,84 +151,8 @@ opp = {
     4: 3
 }
 
-def printarea(area):
-    print("--------")
-    print("")
-    for b in range(min(area.keys()), max(area.keys())+1):
-        area.setdefault(b, {})
-
-        mi = min([min(area[k].keys(), default = 0) for k in area.keys()], default = 0)
-
-        ma = max([max(area[k].keys(), default = 0) for k in area.keys()], default = 0)
-
-        for a in range(mi, ma+1):
-            if a not in area[b]:
-                print(" ", end='')
-            elif a == x and b == y:
-                print('D', end='')
-            elif a == 0 and b == 0:
-                print('X', end='')
-            else:
-                print(area[b][a][0], end='')
-        print("")
-
-    print("")
-
 def ch(x, y, d):
     return (x + change[d][0], y + change[d][1])
-
-def unexplored(area, xx, yy, exclude):
-    backup = None
-    for d in [z for z in [4,3,2,1] if z not in exclude]:
-        (xxx, yyy) = ch(xx, yy, d)
-        if yyy not in area:
-            return d
-        elif xxx not in area[yyy]:
-            return d
-        elif area[yyy][xxx][0] == '.':
-            if backup == None:
-                backup = (d, area[yyy][xxx][1])
-            else:   
-                backup = (d, area[yyy][xxx][1]) if area[yyy][xxx][1] < backup[1] else backup
-    return backup[0]
-
-
-def blaah():
-    count = 1
-    for out in execute(origmemory, arraygen(input)):
-
-        count += 1
-
-        if out == 0:
-            area.setdefault(y+change[lastdir][1], {})[x+change[lastdir][0]] = ('#', count)
-            nd = unexplored(area, x, y, {lastdir})
-            print(0, x,y,lastdir)
-            lastdir = nd
-        elif out == 1:
-            (x,y) = ch(x,y,lastdir)
-            area.setdefault(y, {})[x] = ('.', count)
-            print(1, x,y,lastdir)
-            nd = unexplored(area, x, y, {})
-            lastdir = nd
-        elif out == 2:
-            # TODO
-            (x,y) = ch(x,y,lastdir)
-            print("Arrival", x, y)
-            break
-        printarea(area)
-        input.append(nd)
-
-
-visited = {}
-visited.setdefault(0, {})[0] = True
-
-queue = []
-input = []
-
-# coord, dist, path
-queue.append(((0,0), 0, []))
-
-g = None
 
 def getCell(dir):
     global g
@@ -264,8 +185,18 @@ def backTrack(path):
 
 # Part 1
 
+visited = {}
+visited.setdefault(0, {})[0] = True
+
+queue = []
+input = []
+
+# coord, dist, path
+queue.append(((0,0), 0, []))
+
+g = None
+
 result = None
-count = 0
 part2StartPath = None
 part2x = None
 part2y = None
@@ -278,8 +209,6 @@ while len(queue) and result == None:
     y = curr[0][1]
     dist = curr[1]
 
-    print(len(curr[2]))
-
     gotoTo(curr[2])
 
     for d in range(1,5):
@@ -291,12 +220,10 @@ while len(queue) and result == None:
 
         if out == 0:
             visited.setdefault(yy, {})[xx] = True
-            area.setdefault(yy, {})[xx] = ('#', count)
 
         elif out == 1:
             queue.append(((xx, yy), dist + 1, curr[2] + [d]))
             visited.setdefault(yy, {})[xx] = True
-            area.setdefault(yy, {})[xx] = ('.', count)
 
         elif out == 2:
             result = dist+1
@@ -304,11 +231,9 @@ while len(queue) and result == None:
             part2x = xx
             part2y = yy
 
-        printarea(area)
-
     backTrack(curr[2])
 
-print("Result", result)
+print("Result 1", result)
 
 # Part 2
 
@@ -348,15 +273,11 @@ while len(queue):
 
         if out == 0:
             visited.setdefault(yy, {})[xx] = True
-            area.setdefault(yy, {})[xx] = ('#', count)
 
         elif out == 1:
             queue.append(((xx, yy), dist + 1, curr[2] + [d]))
             visited.setdefault(yy, {})[xx] = True
-            area.setdefault(yy, {})[xx] = ('.', count)
-
-        printarea(area)
 
     backTrack(curr[2])
 
-print("Result", result)
+print("Result 2", result)
