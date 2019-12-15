@@ -108,8 +108,6 @@ result = None
 while True:
     lrs = exec2(low)
     hrs = exec2(high)
-    print (low, high)
-    print (lrs, hrs)
 
     if low == high:
         result = low
