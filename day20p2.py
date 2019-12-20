@@ -1,4 +1,5 @@
 
+from queue import PriorityQueue
 
 text_file = open("input20.txt", "r")
 lines = text_file.readlines()
@@ -13,6 +14,7 @@ portalpoints = {}
 W = '#'
 F = '.'
 S = '0'
+O = 'O'
 
 def ga(x, y):
     if y in area:
@@ -34,7 +36,6 @@ for y in range(len(lines)):
         x += 1
     maxy = max(maxy, y)
 
-
 # Determine portals
 for y in range(maxy+1):
     for x in range(maxx+1):
@@ -45,8 +46,6 @@ for y in range(maxy+1):
         for z in range(4):
             c2 = ga(x+d[0], y+d[1])
             if c2 == F:
-                if c == 'E':
-                    print(d, x, y)
                 portalpoint = (x+d[0], y+d[1])
                 d = (-d[0], -d[1])
                 c3 = ga(x+d[0], y+d[1])
@@ -55,11 +54,16 @@ for y in range(maxy+1):
                 else:
                     portal = c+c3
 
-                i = portal + 'i'
-                distances.setdefault(portal, {})[i] = 1
-                distances.setdefault(i, {})[portal] = 1
-                if not (x == 1 or y == 1 or x == 133 or y == 125):
-                    portal = i
+                portalo = (portal, O)
+                portali = (portal, 'i')
+
+                #distances.setdefault(portalo, {})[portali] = 1
+                #distances.setdefault(portali, {})[portalo] = 1
+
+                if x == 1 or y == 1 or x == maxx-2 or y == maxy-1:
+                    portal = portalo
+                else:
+                    portal = portali
                 
                 portals[portal] = portalpoint
                 portalpoints[portalpoint] = portal
@@ -99,7 +103,6 @@ def bfs(portal):
 
 
 for p in portals.keys():
-    print("BFS", p)
     distances.setdefault(p, {})
     result = bfs(p)
     for r in result:
@@ -107,35 +110,101 @@ for p in portals.keys():
         distances.setdefault(r[0], {})[p] = r[1]
 
 
+# Part 1
 # Djikstra shortest path AA to ZZ
 
-print("Djikstra")
+def part1():
+    print("Djikstra 1")
 
-portalnames = set(portals.keys())
-dist = {}
-dist['AA'] = 0
-prev = {}
-prev['AA'] = None
+    portalnames = set(portals.keys())
+    dist = {}
+    dist[('AA', O)] = 0
+    prev = {}
+    prev[('AA', O)] = None
+
+    while True:
+        if len(portalnames) == 0:
+            break
+        mind = 9999999999999
+        minp = None
+        for p in portalnames:
+            if p in dist and dist[p] < mind:
+                mind = dist[p]
+                minp = p
+        if minp == None:
+            break # The graph is broken or exhausted
+        portalnames.remove(minp)
+        if minp == ('ZZ', O):
+            break
+
+        for p in distances[minp]:
+            alt = dist[minp] + distances[minp][p]
+            if p not in dist or alt < dist[p]:
+                dist[p] = alt
+                prev[p] = minp
+
+    print('Result 1:', dist[('ZZ', O)])
+
+
+# Part 2
+# Djikstra shortest path AA to ZZ
+
+def neighbours(portal):
+    directs = distances[portal[1]].keys()
+    cost = portal[0]
+    pt = portal[1]
+    level = portal[2]
+
+    #print("Directs:", directs)
+    if level == 0:
+        directs = [p for p in directs if p[1] == 'i' or p[0] == 'AA' or p[0] == 'ZZ']
+    else:
+        directs = [p for p in directs if p[0] != 'AA' and p[0] != 'ZZ']
+
+    directs = [(cost+distances[portal[1]][p], p, level) for p in directs]
+
+    # Add intra-dimensional stuff
+    if pt[1] == 'i':
+        directs.append((cost+1, (portal[1][0], O), level+1))
+    elif pt[0] != 'AA' and pt[0] != 'ZZ':
+        directs.append((cost+1, (portal[1][0], 'i'), level-1))
+
+    return directs
+
+
+print("UCS")
+
+queue = PriorityQueue()
+
+# Dist, portal, level
+queue.put((0, ('AA', O), 0))
+
+# (portal, level)
+visited = set()
+
+dist = 0
+
+result = 0
 
 while True:
-    if len(portalnames) == 0:
-        break
-    mind = 9999999999999
-    minp = None
-    for p in portalnames:
-        if p in dist and dist[p] < mind:
-            mind = dist[p]
-            minp = p
-    if minp == None:
-        break # The graph is broken or exhausted
-    portalnames.remove(minp)
-    if minp == 'ZZ':
+    if queue.empty():
+        #print("Error no Q")
         break
 
-    for p in distances[minp]:
-        alt = dist[minp] + distances[minp][p]
-        if p not in dist or alt < dist[p]:
-            dist[p] = alt
-            prev[p] = minp
+    p = queue.get()
+    #print("Got from Q:", p)
+    if p[1] == ('ZZ', O):
+        result = p[0]
+        break
 
-print('Result 1', dist['ZZ'])
+    visited.add((p[1], p[2]))
+
+    nbh = neighbours(p)
+
+    for n in nbh:
+        if (n[1], n[2]) in visited:
+            continue
+        queue.put(n)
+        #print("Put to Q:", n)
+
+print('Result 2', result)
