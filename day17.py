@@ -152,24 +152,34 @@ input = {}
 
 g = execute(origmemory, arraygen(input))
 
+robotx = 0
+roboty = 0
+
+maxx = 0
+maxy = 0
+
 x = 0
 y = 0
 for p in g:
+    maxy = max(maxy,y)
     if p == 46:
         area.setdefault(y, {})[x] = Spot('.', x*y)
         x += 1
     elif p == 10:
         y += 1
+        maxx = max(maxx,x)
         x = 0
     else:
         # incl. robot
         area.setdefault(y, {})
         count = 0
         if x in area[y]:
-
             count = area[y][x].count
         
         area[y][x] = Spot(chr(p), x*y, count)
+        if chr(p) in ('<', '>', '^', 'v'):
+            robotx = x
+            roboty = y
 
         for pp in ((y-1, x), (y+1, x), (y, x-1), (y, x+1)):
             area.setdefault(pp[0], {}).setdefault(pp[1], Spot('.', pp[0]*pp[1]))
@@ -180,13 +190,11 @@ for p in g:
         x += 1
 
 print("")
-for y in range(43):
-    for x in range(39):
+for y in range(maxy):
+    for x in range(maxx):
         print(area[y][x].type, end='')
     print("")
 print("")
-
-#print([area[y][x] for x in [area[y] for y in area]])
 
 print(
     sum([s.score for s in
@@ -195,3 +203,101 @@ print(
 
 )
 
+def ga(x,y):
+    if y in area:
+        if x in area[y]:
+            return area[y][x]
+        return area[y].setdefault(x, Spot('.', 0)) # No score needed any more
+
+path = ['R']
+
+x = robotx
+y = roboty
+print(x,y)
+d = (1, 0)
+steps = 0
+while True:
+    if ga(x+d[0], y+d[1]).type == '#':
+        x += d[0]
+        y += d[1]
+        steps += 1
+        continue
+
+    #for i in range(steps // 2):
+        #path.append(2)
+    path.append(steps)
+    steps = 0
+    if ga(x-d[1], y+d[0]).type == '#':
+        d = (-d[1], d[0])
+        path.append('R')
+    elif ga(x+d[1], y-d[0]).type == '#':
+        d = (d[1], -d[0])
+        path.append('L')
+    else:
+        break
+
+print(path)
+print(len(path))
+
+# Part 2
+
+
+main = ['A','B','A','B','A','C','B','C','A','C']
+
+fa = ['R', 4, 'L', 10, 'L', 10]
+fb = ['L', 8, 'R', 12, 'R', 10, 'R', 4]
+fc = ['L', 8, 'L', 8, 'R', 10, 'R', 4]
+
+
+fcomma = lambda x: ord(',')
+
+iline1 = list([f(x) for x in main for f in (ord,fcomma)])
+iline1 = iline1[:-1] + [10]
+
+
+def translate(l):
+    result = []
+
+    for i in l:
+        if isinstance(i, str) and ord(i) > 57:
+            result.append(ord(i))
+        else:
+            if i >= 10:
+                result.append(i // 10 + 48)
+            result.append(i % 10 + 48)
+
+        result.append(ord(','))
+
+    result = result[:-1] + [10]
+    return result
+
+iline2 = translate(fa)
+iline3 = translate(fb)
+iline4 = translate(fc)
+iline5 = [110, 10]
+
+origmemory[0] = 2
+
+print(iline2)
+
+g = execute(origmemory, arraygen(iline1+iline2+iline3+iline4+iline5))
+
+lastout = None
+
+result = []
+
+memory = None
+
+for o in g:
+        result.append(o)
+        lastout = o
+
+#for c in [chr(o) for o in result]:
+#    if c == chr(10):
+#        print("")
+#    else:
+#        print(c, end = '')
+
+print(lastout)
+
+#print("Result 2", out)
