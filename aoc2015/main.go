@@ -4,7 +4,6 @@ import "aoc2015/days"
 
 func main() {
 
-	days.Day03()
+	days.Day04()
 
 }
-
