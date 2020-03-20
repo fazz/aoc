@@ -68,3 +68,11 @@ func BFilter(vs []byte, f func(byte) bool) []byte {
 	}
 	return vsf
 }
+
+func Last(i []string) string {
+	return i[len(i)-1]
+}
+
+func ButLast(i []string) []string {
+	return i[:len(i)-1]
+}
