@@ -76,3 +76,18 @@ func Last(i []string) string {
 func ButLast(i []string) []string {
 	return i[:len(i)-1]
 }
+
+func IPow(a, b int) int {
+	var result int = 1
+
+	for 0 != b {
+		if 0 != (b & 1) {
+			result *= a
+
+		}
+		b >>= 1
+		a *= a
+	}
+
+	return result
+}
