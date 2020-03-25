@@ -13,24 +13,26 @@ import (
 	"strconv"
 )
 
-// node node cost
-var routes map[string]map[string]int
-var nodes []string
+var day09 struct {
+	// node node cost
+	routes map[string]map[string]int
+	nodes  []string
+}
 
 func add(a, b string, dist int) {
-	_, afound := routes[a]
-	_, bfound := routes[b]
+	_, afound := day09.routes[a]
+	_, bfound := day09.routes[b]
 
 	if !afound {
-		nodes = append(nodes, a)
-		routes[a] = make(map[string]int)
+		day09.nodes = append(day09.nodes, a)
+		day09.routes[a] = make(map[string]int)
 	}
 	if !bfound {
-		nodes = append(nodes, b)
-		routes[b] = make(map[string]int)
+		day09.nodes = append(day09.nodes, b)
+		day09.routes[b] = make(map[string]int)
 	}
-	routes[a][b] = dist
-	routes[b][a] = dist
+	day09.routes[a][b] = dist
+	day09.routes[b][a] = dist
 
 }
 
@@ -44,8 +46,8 @@ func Day09() {
 
 	reader := bufio.NewReader(file)
 
-	nodes = make([]string, 0)
-	routes = make(map[string]map[string]int)
+	day09.nodes = make([]string, 0)
+	day09.routes = make(map[string]map[string]int)
 
 	for {
 		line, _, err := reader.ReadLine()
@@ -113,7 +115,7 @@ func takeall(passed []string, all []string) chan string {
 	go func() {
 		for _, n := range all {
 			_, included := lookup[n]
-			_, routeexists := routes[from][n]
+			_, routeexists := day09.routes[from][n]
 			if !included && routeexists {
 				outputChannel <- n
 			}
@@ -125,7 +127,7 @@ func takeall(passed []string, all []string) chan string {
 
 func heldkarp() (int, int, error) {
 
-	nodecount := len(nodes)
+	nodecount := len(day09.nodes)
 
 	type Choice struct {
 		ontheroad []string
@@ -138,7 +140,7 @@ func heldkarp() (int, int, error) {
 
 	lcandidates[1] = make(map[string]Choice)
 	hcandidates[1] = make(map[string]Choice)
-	for _, n := range nodes {
+	for _, n := range day09.nodes {
 		lcandidates[1][n] = Choice{ontheroad: []string{n}, length: 0}
 		hcandidates[1][n] = Choice{ontheroad: []string{n}, length: 0}
 	}
@@ -153,14 +155,14 @@ func heldkarp() (int, int, error) {
 			last := common.Last(this.ontheroad)
 
 			// generate all next options
-			for nextnode := range takeall(this.ontheroad, nodes) {
+			for nextnode := range takeall(this.ontheroad, day09.nodes) {
 
 				nextkey := normalize(this.ontheroad, nextnode)
 
 				// find if this option is minimal S+next
 				next, found := lcandidates[i+1][nextkey]
 
-				newlen := this.length + routes[last][nextnode]
+				newlen := this.length + day09.routes[last][nextnode]
 				newroad := make([]string, len(this.ontheroad))
 				copy(newroad, this.ontheroad)
 				newwinner := Choice{
@@ -183,14 +185,14 @@ func heldkarp() (int, int, error) {
 			last := common.Last(this.ontheroad)
 
 			// generate all next options
-			for nextnode := range takeall(this.ontheroad, nodes) {
+			for nextnode := range takeall(this.ontheroad, day09.nodes) {
 
 				nextkey := normalize(this.ontheroad, nextnode)
 
 				// find if this option is minimal S+next
 				next, found := hcandidates[i+1][nextkey]
 
-				newlen := this.length + routes[last][nextnode]
+				newlen := this.length + day09.routes[last][nextnode]
 				newroad := make([]string, len(this.ontheroad))
 				copy(newroad, this.ontheroad)
 				newwinner := Choice{
@@ -210,7 +212,7 @@ func heldkarp() (int, int, error) {
 
 	min := math.MaxInt32
 	for _, v := range lcandidates[nodecount] {
-		if len(v.ontheroad) == len(nodes) {
+		if len(v.ontheroad) == len(day09.nodes) {
 			if v.length < min {
 				min = v.length
 			}
@@ -219,7 +221,7 @@ func heldkarp() (int, int, error) {
 
 	max := math.MinInt32
 	for _, v := range hcandidates[nodecount] {
-		if len(v.ontheroad) == len(nodes) {
+		if len(v.ontheroad) == len(day09.nodes) {
 			if v.length > max {
 				max = v.length
 			}

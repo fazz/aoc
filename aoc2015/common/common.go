@@ -1,5 +1,7 @@
 package common
 
+import "sort"
+
 // Max returns the larger of x or y.
 func I8Max(x, y int8) int8 {
 	if x < y {
@@ -90,4 +92,59 @@ func IPow(a, b int) int {
 	}
 
 	return result
+}
+
+// TSP
+
+func AddToRoutes(routes map[string]map[string]int, nodes []string, a, b string, dist int) (map[string]map[string]int, []string) {
+	_, afound := routes[a]
+	_, bfound := routes[b]
+
+	if !afound {
+		nodes = append(nodes, a)
+		routes[a] = make(map[string]int)
+	}
+	if !bfound {
+		nodes = append(nodes, b)
+		routes[b] = make(map[string]int)
+	}
+	routes[a][b] = dist
+	routes[b][a] = dist
+
+	return routes, nodes
+}
+
+func TSPNormalize(path []string, next string) string {
+	b := make([]string, len(path))
+	copy(b, path)
+	sort.Strings(b)
+
+	ret := ""
+	for _, s := range b {
+		ret += s
+	}
+	return ret + next
+}
+
+func TSPTakeAll(routes map[string]map[string]int, passed []string, all []string) chan string {
+	outputChannel := make(chan string)
+
+	from := Last(passed)
+
+	lookup := make(map[string]bool)
+	for _, p := range passed {
+		lookup[p] = true
+	}
+
+	go func() {
+		for _, n := range all {
+			_, included := lookup[n]
+			_, routeexists := routes[from][n]
+			if !included && routeexists {
+				outputChannel <- n
+			}
+		}
+		close(outputChannel)
+	}()
+	return outputChannel
 }
