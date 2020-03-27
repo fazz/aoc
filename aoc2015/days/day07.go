@@ -84,7 +84,7 @@ func Day07() {
 
 	}
 
-	result1 := calc("a", rules)
+	result1 := calc07("a", rules)
 
 	fmt.Println("Part 1:", result1)
 
@@ -93,13 +93,13 @@ func Day07() {
 		return result1
 	}}
 
-	result2 := calc("a", rules)
+	result2 := calc07("a", rules)
 
 	fmt.Println("Part 2:", result2)
 
 }
 
-func calc(tocalc string, rules map[string]Rule) uint16 {
+func calc07(tocalc string, rules map[string]Rule) uint16 {
 
 	cached, found := values[tocalc]
 	if found {
@@ -113,7 +113,7 @@ func calc(tocalc string, rules map[string]Rule) uint16 {
 	i1_64, err := strconv.ParseUint(r.I1, 10, 16)
 
 	if err != nil {
-		i1 = calc(r.I1, rules)
+		i1 = calc07(r.I1, rules)
 	} else {
 		i1 = uint16(i1_64)
 	}
@@ -121,7 +121,7 @@ func calc(tocalc string, rules map[string]Rule) uint16 {
 	i2_64, err := strconv.ParseUint(r.I2, 10, 16)
 
 	if err != nil {
-		i2 = calc(r.I2, rules)
+		i2 = calc07(r.I2, rules)
 	} else {
 		i2 = uint16(i2_64)
 	}

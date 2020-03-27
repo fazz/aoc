@@ -10,6 +10,28 @@ func I8Max(x, y int8) int8 {
 	return x
 }
 
+func IMax(x, y int) int {
+	if x < y {
+		return y
+	}
+	return x
+}
+
+// Min returns the smaller of x or y.
+func IMin(x, y int) int {
+	if x > y {
+		return y
+	}
+	return x
+}
+
+func IAbs(x int) int {
+	if x < 0 {
+		return 0 - x
+	}
+	return x
+}
+
 func Max(x, y int64) int64 {
 	if x < y {
 		return y

@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 var day09 struct {
@@ -91,14 +92,11 @@ func calc09() (int, int) {
 }
 
 func normalize(path []string, next string) string {
-	b := make([]string, len(path))
-	copy(b, path)
+	b := append([]string(nil), path...)
 	sort.Strings(b)
 
-	ret := ""
-	for _, s := range b {
-		ret += s
-	}
+	ret := strings.Join(b, "")
+
 	return ret + next
 }
 
