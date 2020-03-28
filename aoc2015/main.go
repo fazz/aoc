@@ -4,6 +4,6 @@ import "aoc2015/days"
 
 func main() {
 
-	days.Day15()
+	days.Day16()
 
 }

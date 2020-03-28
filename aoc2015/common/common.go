@@ -2,6 +2,18 @@ package common
 
 import "sort"
 
+func Lt(x, y int64) bool {
+	return x < y
+}
+
+func Gt(x, y int64) bool {
+	return x > y
+}
+
+func Eq(x, y int64) bool {
+	return x == y
+}
+
 // Max returns the larger of x or y.
 func I8Max(x, y int8) int8 {
 	if x < y {
