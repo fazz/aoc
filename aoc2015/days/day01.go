@@ -25,7 +25,4 @@ func Day01() {
 	fmt.Println("Part 1:", count)
 	fmt.Println("Part 2:", neg)
 
-
 }
-
-
