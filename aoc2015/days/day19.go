@@ -73,7 +73,7 @@ func Day19() {
 
 	}
 
-	//	fmt.Println("Part 1:", len(results))
+	fmt.Println("Part 1:", len(results))
 
 	ptoslice := func(i string) []string {
 
@@ -84,8 +84,6 @@ func Day19() {
 	}
 
 	terminals := make(map[string]bool)
-	//nonterminals := make(map[string]bool)
-	//tokens := make(map[string]bool)
 
 	// Terminals in upper-case
 	word := make([]string, 0)
@@ -118,90 +116,4 @@ func Day19() {
 	parseresult := day19.Parse("s", grammar, word)
 
 	fmt.Println("Part 2:", parseresult.ShortestDerivation-len(word)-1)
-	// 605 too high
-	// 400 too high
-
-	//
-	//
-	//
-
-	/*
-
-		for k := range tr {
-			nonterminals[k] = true
-		}
-
-		for _, t := range ptoslice(input) {
-			if _, ok := nonterminals[t]; !ok {
-				terminals[t] = true
-			}
-			tokens[t] = true
-		}
-
-		for _, v := range tr {
-			for _, dst := range v {
-				for _, t := range ptoslice(dst) {
-					if _, ok := nonterminals[t]; !ok {
-						terminals[t] = true
-					}
-				}
-			}
-		}
-
-		fmt.Println("grammar Day19;")
-		fmt.Println("// Tokens")
-
-		ccase := func(i string) string {
-			if _, ok := tokens[i]; ok {
-				return strings.ToUpper(i)
-			}
-			return strings.ToLower(i)
-		}
-
-		tcase := func(i string) string {
-			if _, ok := nonterminals[i]; !ok {
-				return strings.ToUpper(i)
-			}
-			return strings.ToLower(i)
-		}
-
-		for k := range tokens {
-			fmt.Println(strings.ToUpper(k), ": '"+k+"';")
-		}
-
-		fmt.Println("// Rules")
-
-		fmt.Println("start : e EOF;")
-
-		for k, v := range tr {
-
-			out := strings.ToLower(k) + " : "
-
-			for i, dst := range v {
-
-				if i > 0 {
-					out += " | "
-				}
-
-				for i := 0; i <= 1; i++ {
-
-					if i > 0 {
-						out += " | "
-					}
-
-					for _, d := range ptoslice(dst) {
-						if i == 0 {
-							out += ccase(d) + " "
-						} else {
-							out += tcase(d) + " "
-						}
-					}
-					out += "\n"
-
-				}
-			}
-			//fmt.Println(out + ";")
-		}
-
-		//fmt.Println("Part 2:", p2)*/
 }

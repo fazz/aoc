@@ -15,9 +15,10 @@ type Data struct {
 }
 
 type Complete struct {
-	Src  string
-	Drv  []string
-	Cost int
+	Src        string
+	Drv        []string
+	Calculated bool
+	Cost       int
 }
 
 type Source struct {
@@ -70,7 +71,7 @@ func pt(term string) bool {
 	return term == strings.ToUpper(term)
 }
 
-func minCover(currentmin int, symbols []string, origin, end int, completions map[int]map[int]map[string]*Complete) (int, int) {
+func minCover(symbols []string, origin, end int, completions map[int]map[int]map[string]*Complete) (int, int) {
 
 	ntstart := 0
 
@@ -101,17 +102,18 @@ func minCover(currentmin int, symbols []string, origin, end int, completions map
 					continue
 				}
 
-				cost := v.Cost
-
-				if cost >= currentmin {
-					continue
+				if !v.Calculated {
+					v.Calculated = true
+					c, _ := minCover(v.Drv, origin+ntstart, prodend, completions)
+					v.Cost = c + 1
 				}
+				cost := v.Cost
 
 				if prodend == end {
 					mincost = common.IMin(cost, mincost)
 					covered = end
 				} else if prodend < end {
-					c2, e := minCover(currentmin-cost, symbols[1:], prodend, end, completions)
+					c2, e := minCover(symbols[ntstart+1:], prodend, end, completions)
 					if e == end {
 						mincost = common.IMin(cost+c2, mincost)
 						covered = end
@@ -162,7 +164,7 @@ func Parse(start string, grammar map[string][][]string, input []string) ParseRes
 			set[pos] = append(set[pos], Item{data: data, sources: sources})
 		}
 
-		// Calculate minimal possible way to cover this derivation
+		// Record completions
 		if len(data.Tail) == 0 {
 			// Init, if needed
 			if _, ok = completions[origin]; !ok {
@@ -172,18 +174,10 @@ func Parse(start string, grammar map[string][][]string, input []string) ParseRes
 				completions[origin][pos] = make(map[string]*Complete)
 			}
 
-			key := normalizeC(Complete{src, head, 0})
+			complete := Complete{src, head, false, math.MaxInt32}
+			key := normalizeC(complete)
 			if _, ok := completions[origin][pos][key]; !ok {
-				completions[origin][pos][key] = &Complete{src, head, math.MaxInt32}
-			}
-
-			currentmin := completions[origin][pos][key].Cost
-
-			// Calculation
-
-			c, e := minCover(currentmin, head, origin, pos, completions)
-			if e == pos {
-				completions[origin][pos][key].Cost = common.IMin(c+1, completions[origin][pos][key].Cost)
+				completions[origin][pos][key] = &complete
 			}
 		}
 	}
@@ -231,7 +225,6 @@ func Parse(start string, grammar map[string][][]string, input []string) ParseRes
 		i := 0
 
 		for pos < len(set) && i < len(set[pos]) {
-			fmt.Println(pos, len(set))
 			// Finished
 			if len(set[pos][i].data.Tail) == 0 {
 				// Completer
@@ -253,15 +246,16 @@ func Parse(start string, grammar map[string][][]string, input []string) ParseRes
 
 	result := ParseResult{ShortestDerivation: math.MaxInt32}
 
-	complete := Complete{start, []string{grammar[start][0][0]}, 0}
+	complete := Complete{start, []string{grammar[start][0][0]}, false, 0}
 
 	// Accepted
 	if c, ok := completions[0][len(input)][normalizeC(complete)]; ok {
 		result.Accepted = true
-		result.ShortestDerivation = c.Cost
-	}
 
-	fmt.Println(result)
+		// Calculation
+		count, _ := minCover(c.Drv, 0, len(input), completions)
+		result.ShortestDerivation = count + 1
+	}
 
 	return result
 }

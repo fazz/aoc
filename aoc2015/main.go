@@ -1,9 +1,9 @@
 package main
 
-import "aoc2015/days"
+import (
+	"aoc2015/days/day20"
+)
 
 func main() {
-
-	days.Day19()
-
+	day20.Exec()
 }
