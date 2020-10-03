@@ -2,16 +2,17 @@
 use clap::{Arg, App};
 mod day01;
 mod day02;
+mod day03;
 
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
 }
 
-
 fn execute(day: i32) {
     match day {
         1 => day01::exec(),
         2 => day02::exec(),
+        3 => day03::exec(),
         _ => ()
     }
 }
