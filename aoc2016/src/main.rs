@@ -1,8 +1,8 @@
 
 use clap::{Arg, App};
-mod day01;
-mod day02;
-mod day03;
+
+mod common;
+mod days;
 
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
@@ -10,9 +10,10 @@ fn print_type_of<T>(_: &T) {
 
 fn execute(day: i32) {
     match day {
-        1 => day01::exec(),
-        2 => day02::exec(),
-        3 => day03::exec(),
+        1 => days::day01::exec(),
+        2 => days::day02::exec(),
+        3 => days::day03::exec(),
+        4 => days::day04::exec(),
         _ => ()
     }
 }

@@ -1950,12 +1950,6 @@ pub fn exec() {
 
     println!("Part1: {:?}", count(&input));
 
-    //let input = [
-    //    (1,1,1),
-    //    (1,5,1),
-    //    (5,1,1)
-    //];
-
     let inputlen = input.len() / 3;
 
     let mut turnedinput: Vec<(i32, i32, i32)> = Vec::new();
