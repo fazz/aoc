@@ -1,7 +1,6 @@
 use regex::Regex;
 use std;
 use std::cmp::Ordering;
-use std::cmp::{max, min};
 use std::collections::HashMap;
 
 use crate::common;
@@ -48,7 +47,7 @@ pub fn exec() {
             return Ordering::Less;
         });
 
-        let mut accumulator = String::from ("");
+        let mut accumulator = String::from("");
         let folded = counts.iter().fold(&mut accumulator, |acc, e| {
             if acc.len() >= 5 {
                 return acc;
@@ -62,27 +61,27 @@ pub fn exec() {
 
             let realshift = (sector_id % 26) as i8;
 
-            let mut accumulator = String::from ("");
-            let x = name.chars().into_iter().map(
-                |c| {
+            let mut accumulator = String::from("");
+            let x = name
+                .chars()
+                .into_iter()
+                .map(|c| {
                     if c == '-' {
                         return ' ';
                     }
                     let mut ca = c as i8 - 'a' as i8;
                     ca += realshift;
                     return (ca % 26 + 'a' as i8) as u8 as char;
-                }
-            ).fold(&mut accumulator, |acc, v| {
-                acc.push(v);
-                return acc;
-            }
-            );
+                })
+                .fold(&mut accumulator, |acc, v| {
+                    acc.push(v);
+                    return acc;
+                });
 
             if x == "northpole object storage" {
                 part2 = sector_id;
             }
         };
-
     }
 
     println!("Part1: {:?}", part1);
