@@ -16,6 +16,9 @@ fn execute(day: i32) {
         4 => days::day04::exec(),
         5 => days::day05::exec(),
         6 => days::day06::exec(),
+        7 => days::day07::exec(),
+        8 => days::day08::exec(),
+        9 => days::day09::exec(),
         _ => ()
     }
 }
