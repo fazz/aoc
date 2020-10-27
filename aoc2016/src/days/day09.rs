@@ -4,8 +4,6 @@ use crate::common;
 pub fn exec() {
     let input = common::lines_from_file("input09.txt");
 
-    //let input = vec!["(27x12)(20x12)(13x14)(7x10)(1x12)A"];
-
     let mut part1 = 0;
     let mut part2 = 0;
 

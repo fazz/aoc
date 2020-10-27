@@ -1,8 +1,5 @@
 use std;
-use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::iter;
-use std::iter::FromIterator;
 
 use crate::common;
 
