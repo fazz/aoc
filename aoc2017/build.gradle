@@ -1,0 +1,30 @@
+/*
+ *  Copyright 2020 Cybernetica AS
+ *  All rights reserved.
+ *  The usage of this code is subject to appropriate license agreement.
+ *  Please contact info@cyber.ee for licensing.
+ *
+ */
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'application'
+}
+group = 'aoc2017'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+//
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '13'
+}
+
+application {
+    mainClassName = 'MainKt'
+}

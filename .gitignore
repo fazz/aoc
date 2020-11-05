@@ -130,3 +130,7 @@ dmypy.json
 
 # Rust
 Cargo.lock
+
+.gradle
+.idea
+
