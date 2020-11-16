@@ -21,6 +21,9 @@ fn execute(day: i32) {
         10 => days::day10::exec(),
         11 => days::day11::exec(),
         12 => days::day12::exec(),
+        13 => days::day13::exec(),
+        14 => days::day14::exec(),
+        15 => days::day15::exec(),
         _ => (),
     }
 }
