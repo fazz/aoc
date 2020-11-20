@@ -24,7 +24,10 @@ fn execute(day: i32) {
         13 => days::day13::exec(),
         14 => days::day14::exec(),
         15 => days::day15::exec(),
-        _ => (),
+        16 => days::day16::exec(),
+        17 => days::day17::exec(),
+        18 => days::day18::exec(),
+        _ => {panic!("Unknown day")},
     }
 }
 
