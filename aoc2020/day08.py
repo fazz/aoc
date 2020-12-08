@@ -54,8 +54,42 @@ for i in part1trace:
     if not f:
         continue
     (part2, r, trace) = exec(program)
+    (program, f) = flip(program, i)
     if r == 1:
         break
-    (program, f) = flip(program, i)
 
+print("Part2:", part2)
+
+#
+#
+#
+plen = len(program)
+chart = {}
+def changeinst(idx):
+    global plen, program
+    (i, os) = program[idx]
+    o = idx + os
+    alto = idx + 1
+    if i == "nop":
+        o, alto = alto, o
+    elif i == "acc":
+        o = alto
+    if 0 <= o <= plen:
+        chart.setdefault(o, []).append(idx)
+    return alto
+
+alto = [changeinst(x) for x in range(plen)]
+
+# fold 
+queue = set(chart[plen])
+reachable = set([plen])
+while len(queue) > 0:
+    e = queue.pop()
+    queue = queue.union(chart.setdefault(e, set()))
+    reachable = reachable.union(chart.setdefault(e, set()))
+
+idx = list(filter(lambda x: alto[x] in reachable, part1trace))[0]
+
+(program, f) = flip(program, idx)
+(part2, r, trace) = exec(program)
 print("Part2:", part2)
