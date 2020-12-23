@@ -1,4 +1,3 @@
-#from functools import filter
 import re
 
 text_file = open("input19.txt", "r")
@@ -24,7 +23,7 @@ def serbyint2(ruleno, rules, sbi):
     if ruleno == 11:
         s42 = [serbyint1(42, rules, serbyint1) for rulearr in rules[ruleno]][0]
         s31 = [serbyint1(31, rules, serbyint1) for rulearr in rules[ruleno]][0]
-        return "(" + "|".join([s42*x + s31*x for x in range(1, 5)]) + ")"
+        return "(" + "|".join([s42*x + s31*x for x in range(1, 8)]) + ")"
 
     return serbyint1(ruleno, rules, sbi)
 
@@ -69,7 +68,7 @@ def expand(idx, rules, part2):
             elif part2 and c == 11:
                 s42 = expand(42, rules, False)
                 s31 = expand(31, rules, False)
-                ret += "(" + "|".join([s42*x + s31*x for x in range(1, 5)]) + ")"
+                ret += "(" + "|".join([s42*x + s31*x for x in range(1, 8)]) + ")"
             else:
                 ret += expand(c, rules, part2)
     return ret
