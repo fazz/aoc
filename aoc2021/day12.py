@@ -9,37 +9,27 @@ for l in lines:
     passages.setdefault(b, {})[e] = 1
     passages.setdefault(e, {})[b] = 1
 
-def issmall(s):
-    return s.lower() == s
+def r(last, small, burned, path):
+    rc = 0
+    for n in passages[last]:
+        if n == "end":
+            rc += 1
+        else:
+            if n in small and not burned and n != "start":
+                rc += r(n, small, True, path + (n,))
+
+            elif n not in small:
+                if n.lower() == n:
+                    small.add(n)
+                rc += r(n, small, burned, path + (n,))
+                if n in small:
+                    small.remove(n)
+            
+    return rc
 
 def calc(allowOne):
-    stack = [(['start'], 'start', set(['start']), not allowOne)]
-
-    complete = set()
-
-    while len(stack) > 0:
-        (path, last, small, burned) = stack.pop()
-
-        for n in passages[last]:
-            if n in small:
-                continue
-            
-            if issmall(n):
-                smalln = small.union([n])
-            else:
-                smalln = set(small)
-
-            pathn = path + [n]
-            if n == "end":
-                complete.add(','.join(pathn))
-            else:
-                if not burned:
-                    stack.append((pathn, n, small, True))
-                stack.append((pathn, n, smalln, burned))
-
-    return len(complete)
+    return r('start', set(['start']), not allowOne, ('start',))
 
 print("Part1:", calc(False))
 
 print("Part2:", calc(True))
-

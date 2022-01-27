@@ -59,7 +59,6 @@ for ((x,y), v) in field.items():
         basins.append((x,y))
 
 print("Part1:", score)
-print((datetime.now() - t1).milliseconds)
 
 bsizes = []
 
@@ -78,4 +77,3 @@ for b in basins:
 a = list(reversed(sorted(bsizes)))
 
 print("Part2:", a[0]*a[1]*a[2])
-print((datetime.now() - t1).milliseconds)
