@@ -10,10 +10,11 @@ lines = [x.rstrip("\n\r") for x in text_file.readlines()]
 
 dim = len(lines)
 
-field = {}
+field = []
 for y in range(dim):
+    field.append([])
     for x in range(dim):
-        field[(x,y)] = int(lines[y][x])
+        field[y].append(int(lines[y][x]))
 
 def get(k):
     (x,y) = k
@@ -21,7 +22,7 @@ def get(k):
     x = x % dim
     yc = y // dim
     y = y % dim
-    return ((field[(x,y)] + xc + yc - 1) % 9) + 1
+    return ((field[y][x] + xc + yc - 1) % 9) + 1
 
 def nexts(p,m,q):
     (x,y) = p

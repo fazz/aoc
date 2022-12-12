@@ -2,7 +2,6 @@
 from datetime import datetime
 from collections import defaultdict
 from PIL import Image, ImageDraw, ImageColor
-from copy import deepcopy
 
 t1 = datetime.now()
 
