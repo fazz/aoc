@@ -1,6 +1,7 @@
+
 import datetime
 from copy import deepcopy, copy
-from itertools import compress
+from itertools import product
 from functools import reduce, cmp_to_key
 import operator
 from collections import defaultdict
@@ -12,45 +13,34 @@ from queue import PriorityQueue
 
 start_time = datetime.datetime.now()
 
-lines = [x.rstrip(" \n\r") for x in open("input18.txt", "r")]
+particles = {tuple(map(int, x.rstrip(" \n\r").split(','))) for x in open("input18.txt", "r")}
 
-result1 = 0
+(maxx, maxy, maxz) = (0, 0, 0)
 
-sidec = defaultdict(int)
+def calc(particles):
+    global maxx, maxy, maxz
 
-maxx = 0
-maxy = 0
-maxz = 0
+    sidec = defaultdict(int)
 
-cubes = set()
+    for p in particles:
+        (x, y, z) = p
 
-for l in lines:
-    (x, y, z) = [int(x) for x in l.split(',')]
-    maxx = max(maxx, x)
-    maxy = max(maxy, y)
-    maxz = max(maxy, z)
-    cubes.add((x,y,z))
+        (maxx, maxy, maxz) = (max(maxx, x), max(maxy, y), max(maxy, z))
 
-    sidec[('b', x,y,z)] += 1
-    sidec[('b', x,y,z+1)] += 1
+        sidec[('b', x,y,z)] += 1
+        sidec[('b', x,y,z+1)] += 1
 
-    sidec[('f', x,y,z)] += 1
-    sidec[('f', x,y+1,z)] += 1
+        sidec[('f', x,y,z)] += 1
+        sidec[('f', x,y+1,z)] += 1
 
-    sidec[('s', x,y,z)] += 1
-    sidec[('s', x+1,y,z)] += 1
+        sidec[('s', x,y,z)] += 1
+        sidec[('s', x+1,y,z)] += 1
 
-result1 = sum([x for x in sidec.values() if x == 1])
+    return sum([x for x in sidec.values() if x == 1])
 
-print("Part 1:", result1)
+print("Part 1:", calc(particles))
 
-interesting = []
-
-for a in range(maxx+2):
-    for b in range(maxy+2):
-        for c in range(maxz+2):
-            if (a,b,c) not in cubes:
-                interesting.append((a,b,c))
+interesting = set(product(range(maxx+2), range(maxy+2), range(maxz+2))).difference(particles)
 
 dist = {i: 999999 for i in interesting}
 dist[(0,0,0)] = 0
@@ -65,7 +55,7 @@ while q.qsize() > 0:
 
     (x,y,z) = u[1]
 
-    paths = set([(x+1,y,z), (x-1,y,z), (x,y+1,z), (x,y-1,z), (x,y,z+1), (x,y,z-1)]).difference(cubes)
+    paths = set([(x+1,y,z), (x-1,y,z), (x,y+1,z), (x,y-1,z), (x,y,z+1), (x,y,z-1)]).difference(particles)
     
     for v in paths:
         if v not in dist:
@@ -77,33 +67,8 @@ while q.qsize() > 0:
 
 trapped = [x[0] for x in dist.items() if x[1] == 999999]
 
-result2 = result1
-
-for t in trapped:
-#    print(trapped)
-    (x,y,z) = t
-    if ('b', x,y,z) in sidec:
-        sidec[('b', x,y,z)] += 1
-    if ('b', x,y,z+1) in sidec:
-        sidec[('b', x,y,z+1)] += 1
-
-    if ('f', x,y,z) in sidec:
-        sidec[('f', x,y,z)] += 1
-    if ('f', x,y+1,z) in sidec:
-        sidec[('f', x,y+1,z)] += 1
-
-    if ('s', x,y,z) in sidec:
-        sidec[('s', x,y,z)] += 1
-
-    if ('s', x+1,y,z) in sidec:
-        sidec[('s', x+1,y,z)] += 1
-    
-result2 = sum([x for x in sidec.values() if x == 1])
-
-print("Part 2:", result2)
-# 3495 vale
+print("Part 2:", calc(particles.union(trapped)))
 
 end = datetime.datetime.now()
 
 print("Milliseconds:", (end-start_time).seconds*1000 + (end-start_time).microseconds // 1000)
-
