@@ -17,6 +17,7 @@ lines = [x.rstrip(" \n\r") for x in open("input22.txt", "r")]
 field = defaultdict(lambda: defaultdict(lambda: ' '))
 
 pairs1 = {}
+startx = None
 
 for li in range(0, len(lines)-2):
     l = lines[li]
@@ -29,13 +30,11 @@ for li in range(0, len(lines)-2):
         if c in ('.', '#'):
             if fc == None:
                 fc = ci+1
+        if startx == None and c == '.' and li == 0:
+            startx = ci+1
 
     pairs1[(fc, li+1, (-1, 0))] = (len(l), li+1, (-1, 0))
     pairs1[(len(l), li+1, (1, 0))] = (fc, li+1, (1, 0))
-
-startx = 1
-while field[startx][1] == ' ':
-    startx += 1
 
 guide = ['']
 
@@ -87,6 +86,33 @@ def calc(x, y, pairs):
 
 print("Part 1:", calc(startx, 1, pairs1), 189140)
 
+sz = 50
+
+starters = []
+
+corners = {
+    0: (1, 0, 0, -1, 0, 1, -1, 0),
+    3: (0, 1, 0, 1, 1, 0, 1, 0)
+}
+
+for x in range(4):
+    x = (x+1)*50
+    for y in range(4):
+        y = (y+1)*50
+
+        cells = []
+        for ax in range(2):
+            for ay in range(2):
+                cells.append(field[x+ax][y+ay])
+        if len(tuple(filter(lambda x: x == ' ', cells))) != 1:
+            continue
+
+        c = corners[cells.index(' ')]
+        starters.append( ((x+c[0], y+c[1]), (c[2], c[3]), (c[3], -c[2]) ) )
+        starters.append( ((x+c[4], y+c[5]), (c[6], c[7]), (-c[7], c[6]) ) )
+
+pairs2 = {}
+
 def nxt(x, y, nose, wd):
     nx = x + nose[0]
     ny = y + nose[1]
@@ -106,38 +132,6 @@ def nxt(x, y, nose, wd):
             return (nx+nose[1], ny-nose[0], (nose[1], -nose[0]), (wd[1], -wd[0]))
 
     return (nx, ny, nose, wd)
-
-#LIVE
-
-starters = []
-
-starters.append( ((101, 50), (1, 0), (0, 1)) )
-starters.append( ((100, 51), (0, 1), (1, 0)) )
-
-starters.append( ((51, 100), (0, -1), (-1, 0)) )
-starters.append( ((50, 101), (-1, 0), (0, -1)) )
-
-starters.append( ((51, 150), (1, 0), (0, 1)) )
-starters.append( ((50, 151), (0, 1), (1, 0)) )
-
-sz = 50
-
-# TEST
-
-#starters = []
-#
-#starters.append( ((8, 5), (-1, 0), (0, -1)) )
-#starters.append( ((9, 4), (0, -1), (-1, 0)) )
-#
-#starters.append( ((8, 8), (-1, 0), (0, 1)) )
-#starters.append( ((9, 9), (0, 1), (-1, 0)) )
-#
-#starters.append( ((12, 8), (0, -1), (1, 0)) )
-#starters.append( ((13, 9), (1, 0), (0, -1)) )
-#
-#sz = 4
-
-pairs2 = {}
 
 while len(pairs2) < sz*7*2:
 
