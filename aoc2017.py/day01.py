@@ -1,23 +1,21 @@
 
-text_file = open("input01.txt", "r")
+from aocd import data, post
 
-line = [x.rstrip("\n\r") for x in text_file.readlines()][0]
-
-ll = len(line)
+ll = len(data)
 
 result1 = 0
 
 for i in range(ll):
-    if line[i] == line[(i+1)%ll]:
-        result1 += int(line[i])
+    if data[i] == data[(i+1)%ll]:
+        result1 += int(data[i])
 
-print("Part 1:", result1)
+post.submit(result1, part="a", day=1, year=2017)
 
 result2 = 0
 
 for i in range(ll):
-    if line[i] == line[(i+ll//2)%ll]:
-        result2 += int(line[i])
+    if data[i] == data[(i+ll//2)%ll]:
+        result2 += int(data[i])
 
-print("Part 2:", result2)
+post.submit(result2, part="b", day=1, year=2017)
 
