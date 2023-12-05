@@ -8,14 +8,11 @@ import sys
 
 input = data.split('\n')
 
-r1 = 0
-
 s = input[0][7:]
 
 seeds = tuple(map(int, s.split()))
 
 maps = []
-
 cm = []
 
 for li in range(2, len(input)+1):
@@ -28,75 +25,59 @@ for li in range(2, len(input)+1):
         l = tuple(map(int, input[li].split()))
         cm.append(l)
 
-track = list(seeds)
+wseeds = [(seeds[i*2], seeds[i*2+1]) for i in range(len(seeds)//2)]
 
-for m in maps:
-    nt = []
-    for t in track:
-        match = False
-        for (dest, src, rl) in m:
-            if src <= t and src+rl >= t:
-                nt.append(t + (dest-src))
-                match = True
-        if not match:
-            nt.append(t)
+def calc(wseeds):
 
-    track = nt            
+    for m in maps:
 
-r1 = min(track)
+        nt = []
 
-#################
+        for (tstart, tlen) in wseeds:
+            srcranges = [(tstart, tlen)]
 
-r2 = 0
+            for (dest, src, rl) in m:
 
-track = [(seeds[i*2], seeds[i*2+1]) for i in range(len(seeds)//2)]
+                nranges = []
+                for (tstart, tlen) in srcranges:
 
-for m in maps:
+                    left = (    
+                        tstart,
+                        max(min(src - tstart, tlen), 0)
+                    )
 
-    nt = []
+                    right = (
+                        max(tstart, src + rl),
+                        max(min(tlen - ((src + rl) - tstart), tlen), 0)
+                    )
 
-    for (tstart, tlen) in track:
-        match = False
+                    middle = (
+                        max(src, tstart),
+                        max(min(src + rl, tstart + tlen) - max(src, tstart), 0)
+                    )
 
-        srcranges = [(tstart, tlen)]
+                    if middle[1] > 0:
+                        middle = (middle[0] + (dest-src), middle[1])
+                        nt.append(middle)
 
-        for (dest, src, rl) in m:
+                    if left[1] > 0:
+                        nranges.append(left)
+                    if right[1] > 0:
+                        nranges.append(right)
 
-            nranges = []
-            for (tstart, tlen) in srcranges:
+                srcranges = nranges
+            nt = nt + nranges
+        wseeds = nt
+    return min([x[0] for x in wseeds])
 
-                firstbreak = None
-                secondbreak = None
+wseeds = [(x, 1) for x in seeds]
 
-                if tstart < src and tstart + tlen >= src:
-                    firstbreak = src - 1
+r1 = calc(wseeds)
 
-                if tstart + tlen > src+rl and tstart < src+rl:
-                    secondbreak = src + rl
+post.submit(r1, part="a")
 
-                if firstbreak is not None and secondbreak is None:
-                    nranges.append((tstart, firstbreak-tstart))
-                    nt.append((firstbreak + (dest-src) + 1, tlen - (firstbreak-tstart)))
+wseeds = [(seeds[i*2], seeds[i*2+1]) for i in range(len(seeds)//2)]
 
-                if firstbreak is None and secondbreak is not None:
-                    nranges.append((secondbreak, secondbreak-tstart+1))
-                    nt.append((tstart + (dest-src), tlen - (secondbreak-tstart) - 1))
-
-                if firstbreak is not None and secondbreak is not None:
-                    nt.append((dest, rl))
-                    nranges.append((tstart, firstbreak-tstart))
-                    nranges.append((secondbreak, tstart+tlen-secondbreak))
-
-                if firstbreak is None and secondbreak is None:
-                    if tstart >= src and tstart + tlen <= src + rl:
-                        nt.append((tstart + (dest-src), tlen))
-                    else:
-                        nranges.append((tstart, tlen))
-            srcranges = nranges
-        nt = nt + nranges
-            
-    track = nt
-
-r2 = min([x[0] for x in track])
+r2 = calc(wseeds)
 
 post.submit(r2, part="b")
