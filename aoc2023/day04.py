@@ -1,10 +1,5 @@
 
 from aocd import data, post
-from functools import reduce
-from collections import defaultdict
-import operator
-import re
-import sys
 
 input = data.split('\n')
 
@@ -27,10 +22,10 @@ for li in range(len(input)):
         r1 += 2 ** (c-1)
 
     for x in range(li+1, li+1+c):
-        counts[x] = counts[x] + counts[li]
+        counts[x] += counts[li]
 
-post.submit(r1, part="a")
+post.submit(r1, part="a", day=4)
 
 r2 = sum(counts.values())
 
-post.submit(r2, part="b")
+post.submit(r2, part="b", day=4)

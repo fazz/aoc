@@ -1,10 +1,5 @@
 
 from aocd import data, post
-from functools import reduce
-from collections import defaultdict
-import operator
-import re
-import sys
 
 input = data.split('\n')
 
@@ -27,13 +22,13 @@ for li in range(2, len(input)+1):
 
 wseeds = [(seeds[i*2], seeds[i*2+1]) for i in range(len(seeds)//2)]
 
-def calc(wseeds):
+def calc(seedranges):
 
     for m in maps:
 
         nt = []
 
-        for (tstart, tlen) in wseeds:
+        for (tstart, tlen) in seedranges:
             srcranges = [(tstart, tlen)]
 
             for (dest, src, rl) in m:
@@ -41,20 +36,11 @@ def calc(wseeds):
                 nranges = []
                 for (tstart, tlen) in srcranges:
 
-                    left = (    
-                        tstart,
-                        max(min(src - tstart, tlen), 0)
-                    )
+                    left = (tstart, max(min(src - tstart, tlen), 0))
 
-                    right = (
-                        max(tstart, src + rl),
-                        max(min(tlen - ((src + rl) - tstart), tlen), 0)
-                    )
+                    right = (max(tstart, src + rl), max(min(tlen - ((src + rl) - tstart), tlen), 0))
 
-                    middle = (
-                        max(src, tstart),
-                        max(min(src + rl, tstart + tlen) - max(src, tstart), 0)
-                    )
+                    middle = (max(src, tstart), max(min(src + rl, tstart + tlen) - max(src, tstart), 0))
 
                     if middle[1] > 0:
                         middle = (middle[0] + (dest-src), middle[1])
@@ -67,17 +53,17 @@ def calc(wseeds):
 
                 srcranges = nranges
             nt = nt + nranges
-        wseeds = nt
-    return min([x[0] for x in wseeds])
+        seedranges = nt
+    return min([x[0] for x in seedranges])
 
 wseeds = [(x, 1) for x in seeds]
 
 r1 = calc(wseeds)
 
-post.submit(r1, part="a")
+post.submit(r1, part="a", day=5)
 
 wseeds = [(seeds[i*2], seeds[i*2+1]) for i in range(len(seeds)//2)]
 
 r2 = calc(wseeds)
 
-post.submit(r2, part="b")
+post.submit(r2, part="b", day=5)

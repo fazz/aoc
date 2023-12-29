@@ -1,10 +1,7 @@
 
 from aocd import data, post
-from functools import reduce, cmp_to_key
-from collections import defaultdict, Counter
-import operator
-import re
-import sys
+from functools import cmp_to_key
+from collections import Counter
 
 input = data.split('\n')
 

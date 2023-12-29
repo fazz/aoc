@@ -55,9 +55,9 @@ for yi in range(len(input)):
             coords = []
             gears = set()
 
-post.submit(r1, part="a")
+post.submit(r1, part="a", day=3)
 
 r2 = sum(map(lambda y: y[1][0]*y[1][1], filter(lambda x: len(x[1]) == 2, gearcandidates.items())))
 
-post.submit(r2, part="b")
+post.submit(r2, part="b", day=3)
 

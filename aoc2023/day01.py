@@ -1,10 +1,5 @@
 
 from aocd import data, post
-from functools import reduce
-from collections import defaultdict
-import operator
-import re
-import sys
 
 input = data.split('\n')
 
@@ -17,7 +12,7 @@ def calc(input):
 
 r1 = calc(input)
 
-post.submit(r1, part="a")
+post.submit(r1, part="a", day=1)
 
 def rep(l):
     l = l.replace('one', 'o1e')
@@ -34,4 +29,4 @@ def rep(l):
 
 r2 = calc(map(rep, input))
 
-post.submit(r2, part="b")
+post.submit(r2, part="b", day=1)

@@ -1,21 +1,12 @@
 
 from aocd import data, post
-from functools import reduce
-from collections import defaultdict
-from itertools import accumulate
-import operator
-import re
-import sys
 from math import sqrt
+
 
 input = data.split('\n')
 
-xinput = [
-    'Time: 7',
-    'Distance: 9'
-]
-
 input = [map(int, x.split(':')[1].split()) for x in input]
+
 input = list(zip(input[0], input[1]))
 
 r1 = 1
@@ -34,7 +25,7 @@ for (time, distance) in input:
 
     r1 = r1*calc(time, distance)
 
-post.submit(r1, part="a")
+post.submit(r1, part="a", day=6)
 
 r2 = 0
 
@@ -47,4 +38,4 @@ for v in input:
 
 r2 = calc(int(ts), int(ds))
 
-post.submit(r2, part="b")
+post.submit(r2, part="b", day=6)
