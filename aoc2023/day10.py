@@ -1,11 +1,12 @@
 
 from aocd import data, post
+from collections import defaultdict
 
 input = data.split('\n')
 
 dirs = {
+    '-': {(1, 0): (1, 0), (-1, 0): (-1, 0)},
     '|': {(0, 1): (0, 1), (0, -1): (0, -1)},
-    '-': {(-1, 0): (-1, 0), (1, 0): (1, 0)},
     'L': {(0, 1): (1, 0), (-1, 0): (0, -1)},
     'J': {(1, 0): (0, -1), (0, 1): (-1, 0)},
     '7': {(1, 0): (0, 1), (0, -1): (-1, 0)},
@@ -18,24 +19,11 @@ for yi in range(len(input)):
         break
 
 def finddir(x, y, input):
-    r = []
-    if input[y][x+1] in ('-', 'J', '7'):
-        r.append((1, 0))
-    if input[y][x-1] in ('-', 'G', 'L'):
-        r.append((-1, 0))
-    if input[y-1][x] in ('|', '7', 'F'):
-        r.append((0, -1))
-    if input[y+1][x] in ('|', 'L', 'J'):
-        r.append((0, 1))
+    r = [startd for d in ((0,1), (1,0), (0,-1), (-1, 0)) for startd in dirs[input[y+d[1]][x+d[0]]] if startd == d]
 
-    r = tuple(r)
-
-    repl = {
-        ((1,0), (0, -1)): 'L',
-        ((1,0), (0, 1)): 'F'
-    }
-
-    return (r[0], repl[r])
+    for (k,v) in dirs.items():
+        if (r[0], (-r[1][0], -r[1][1])) in v.items():
+            return (r[0], k)
 
 (d, repl) = finddir(x, y, input)
 
@@ -46,39 +34,30 @@ while True:
     pipe.add((x,y))
     if input[y][x] == 'S':
         break
-    d = dirs[input[y][x]][d]
+    if input[y][x] in dirs:
+        d = dirs[input[y][x]][d]
 
 r1 = (len(pipe)-1)//2
+
+print("r1:", r1)
 
 post.submit(r1, part="a", day=10)
 
 r2 = 0
 
-straight = {'L': '7', '7': 'L', 'J': 'F', 'F': 'J' }
-
 input[y] = input[y].replace('S', repl)
+
+amounts = defaultdict(int, {'L': 0.5, '7': 0.5, 'F': -0.5, 'J': -0.5, '|': 1})
 
 for yi in range(len(input)):
     crossed = 0
-    onpipe = False
-    lastcorner = None
 
     for xi in range(len(input[0])):
         if (xi, yi) in pipe:
-            if onpipe:
-                if input[yi][xi] in ('L', 'J', 'F', '7'):
-                    if input[yi][xi] == straight[lastcorner]:
-                        crossed += 1
-                    onpipe = False
-                    lastcorner = None
-            else:
-                if input[yi][xi] in ('L', 'J', 'F', '7'):
-                    onpipe = True
-                    lastcorner = input[yi][xi]
-                else:
-                    crossed += 1
-
+            crossed += amounts[input[yi][xi]]
         elif crossed%2 == 1:
             r2 += 1
+
+print("r2:", r2)
 
 post.submit(r2, part="b", day=10)
