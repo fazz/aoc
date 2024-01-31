@@ -1,98 +1,52 @@
 
 from aocd import data, post
-from functools import reduce, cmp_to_key
-from collections import defaultdict, Counter
-from itertools import chain, combinations
-from math import factorial
-import operator
-import re
-import sys
-
-from aoc import factor
 
 input = data.split('\n')
 
-def checknumbers(filledpattern, expected, extra=tuple()):
-    s = 0
-    count = 0
-    i = 0
-    mi = len(expected) - 1
-
-    for ci in range(len(filledpattern)):
-        c = filledpattern[ci]
-        if (c == '#' or ci in extra):
-            if s == 0:
-                s = 1
-                count = 1
-            else:
-                count += 1
-        elif c in ('.', '?') and s == 1:
-            if not (i <= mi and expected[i] == count):
-                return False
-            count = 0
-            s = 0
-            i += 1
-
-    if s == 1:
-        if not (i <= mi and expected[i] == count):
-            return False
-        i += 1
-
-    if i != mi+1:
-        return False
-
-    return True
-
-precalc = {}
-def calc(pattern, numbers):
+def calc(pattern, groups):
     global precalc
 
-    if (pattern, numbers) in precalc:
-        return precalc[(pattern, numbers)]
+    if (pattern, groups) in precalc:
+        return precalc[(pattern, groups)]
 
-    number = numbers[0]
+    leftmostgroup = groups[0]
 
     qm = len([c for c in pattern if c == '?'])
 
-    reqd = sum(numbers) - len([c for c in pattern if c == '#'])
+    reqd = sum(groups) - len([c for c in pattern if c == '#'])
 
     if reqd < 0 or qm < reqd:
         return 0
-    elif reqd == 0:
-        if checknumbers(pattern, numbers):
-            return 1
-        else:
-            return 0
+    elif leftmostgroup == 0:
+        return 1
     elif pattern[0] == '.':
-        count = calc(pattern[1:], numbers)
-        precalc[(pattern, numbers)] = count
+        count = calc(pattern[1:], groups)
+        precalc[(pattern, groups)] = count
     else:
-        if '#' in pattern:
-            pi = pattern.index('#')
-        else:
-            pi = len(pattern)
+        pl = len(pattern)
+        nl = len(groups)
 
-        if len(numbers) == 1:
-            start = 0
-            if '#' in pattern:
-                start = pi - number + 1
-            end = min(pi+1, len(pattern)-number+1)
+        fbrokenidx = pattern.find('#')
+        if fbrokenidx == -1:
+            fbrokenidx = pl
+
+        if nl == 1:
+            bbrokenidx = pattern.rfind('#')
+            searchrangestart = max(0, bbrokenidx - leftmostgroup + 1)
+            searchrangeend = min(fbrokenidx + 1, pl - leftmostgroup + 1)
+            g = (0,)
         else:
-            end = min(pi+1, len(pattern)-number-len(numbers[2:])-sum(numbers[1:]))
+            searchrangestart = 0
+            searchrangeend = min(fbrokenidx+1, pl-nl-sum(groups)+2)
+            g = groups[1:]
 
         count = 0
 
-        if len(numbers) == 1:
-            for i in range(start, end):
-                if not '.' in pattern[i:i+number] and (i+number == len(pattern) or pattern[i+number] != '#'):
-                    if checknumbers(pattern, numbers, extra=range(i, i+number)):
-                        count += 1
-        else:
-            for i in range(0, end):
-                if not '.' in pattern[i:i+number] and (i+number == len(pattern) or pattern[i+number] != '#'):
-                    count += calc(pattern[i+number+1:], numbers[1:])
+        for i in range(searchrangestart, searchrangeend):
+            if not '.' in pattern[i:i+leftmostgroup] and (i+leftmostgroup == pl or pattern[i+leftmostgroup] != '#'):
+                count += calc(pattern[i+leftmostgroup+1:], g)
 
-        precalc[(pattern, numbers)] = count
+        precalc[(pattern, groups)] = count
 
     return count
 
