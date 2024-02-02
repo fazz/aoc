@@ -104,3 +104,16 @@ def intersection(a, b):
 
 #####
 
+def hammingdistance(a, b):
+    r = 0
+    for i, c in enumerate(a):
+        if c != b[i]:
+            r += 1
+    return r
+
+def transposestringmatrix(m):
+    r = ["" for x in range(len(m[0]))]
+    for row in m:
+        for i, c in enumerate(row):
+            r[i] += c
+    return r
