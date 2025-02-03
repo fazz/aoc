@@ -134,3 +134,6 @@ Cargo.lock
 .gradle
 .idea
 
+
+fuglede.adventofcode/
+
