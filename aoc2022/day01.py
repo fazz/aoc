@@ -1,18 +1,11 @@
 
-text_file = open("input01.txt", "r")
+import aocd
 
-lines = [x.rstrip("\n\r") for x in text_file.readlines()]
+lines = [""] + aocd.models.Puzzle(year=2022, day=1).input_data.split('\n') + [""]
 
-cals = []
-cal = 0
+ei = [z[1] for z in filter(lambda x: x[0] == "", zip(lines, range(len(lines))))]
 
-i = 0
-while "" in lines[i:]:
-    nxt = i + lines[i:].index("")
-    cals.append([int(x) for x in lines[i:nxt]])
-    i = nxt + 1
-cals.append([int(x) for x in lines[i:]])
-cals = sorted([sum(x) for x in cals], reverse=True)
+cals = sorted([sum(map(int, lines[ei[i]+1:ei[i+1]])) for i in range(len(ei)-1)], reverse = True)
 
 print("Part 1:", cals[0])
 

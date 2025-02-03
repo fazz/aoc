@@ -1,7 +1,7 @@
 
-text_file = open("input02.txt", "r")
+import aocd
 
-lines = [x.rstrip("\n\r").split(' ') for x in text_file.readlines()]
+lines = [x.split(' ') for x in aocd.models.Puzzle(year=2022, day=2).input_data.split('\n')]
 
 f = {"X": 1, "Y": 2, "Z": 3}
 
