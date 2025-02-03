@@ -1,8 +1,10 @@
 
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from functools import reduce
 from itertools import chain
+from heapq import *
 import operator
+import math
 
 generated_primes = [2]
 
@@ -34,6 +36,19 @@ def lcm(numbers):
     z = [xx for x in map(lambda x: Counter(factor(x)).items(), numbers) for xx in x]
     z = reduce(lcm_c, z, defaultdict(int))
     return reduce(lambda o, t: o*(t[0]**t[1]), z.items(), 1)
+
+def vector8segments():
+    d = (1,0)
+    for _ in range(4):
+        yield d
+        yield (d[0] - d[1], d[0] + d[1])
+        d = (-d[1], d[0])
+
+def vector4diagonal():
+    d = (1,1)
+    for _ in range(4):
+        yield d
+        d = (-d[1], d[0])
 
 #####
 
@@ -117,3 +132,133 @@ def transposestringmatrix(m):
         for i, c in enumerate(row):
             r[i] += c
     return r
+
+
+######
+
+def filtersplit(func, it):
+
+    tb = deque()
+    fb = deque()
+
+    it = it.__iter__()
+
+    tit = _filtersplit(func, tb, fb, it)
+    fit = _filtersplit(lambda x: not func(x), fb, tb, it)
+
+    return (tit, fit)
+    
+class _filtersplit:
+    def __init__(self, func, buffer, otherbuffer, iterable):
+        self.func = func
+        self.buffer = buffer
+        self.otherbuffer = otherbuffer
+        self.iterable = iterable
+
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if len(self.buffer) > 0:
+            return self.buffer.popleft()
+        while True:
+            v = next(self.iterable)
+            if self.func(v):
+                return v
+            else:
+                self.otherbuffer.append(v)
+
+
+
+######
+
+def inside(x, y, matrix):
+    return y >= 0 and x >= 0 and y < len(matrix) and x < len(matrix[0])
+
+def inside2(x, y, maxx, maxy):
+    return y >= 0 and x >= 0 and y <= maxy and x <= maxx
+
+# TODO add offset
+def faceinside(matrix):
+    my = len(matrix)
+    mx = len(matrix[0])
+
+    for z in range(mx):
+        yield (z, 0, 0, 1)
+        yield (z, my-1, 0, -1)
+
+    for z in range(my):
+        yield (0, z, 1, 0)
+        yield (mx-1, z, -1, 0)
+
+
+######
+
+def uniform_cost_search(start, neighbors):
+    frontier = []
+    heappush(frontier, (0, start))
+    frontiertrack = {start:0}
+
+    expanded = {}
+
+    while True:
+        if len(frontier) == 0:
+            break
+        (cost, node) = heappop(frontier)
+        if node not in frontiertrack:
+            continue
+        del frontiertrack[node]
+        # No goal checking implemented
+        expanded[node] = cost
+        for (nbc, nb) in neighbors(node):
+            ncost = cost + nbc
+            if nb not in expanded and nb not in frontiertrack:
+                heappush(frontier, (ncost, nb))
+                frontiertrack[nb] = ncost
+            elif nb in frontiertrack and frontiertrack[nb] > ncost:
+                heappush(frontier, (ncost, nb))
+                frontiertrack[nb] = ncost
+
+    return expanded
+
+#####
+
+def astar_path(camefrom, current):
+    total_path = []
+    (cs, current) = current
+    while True:
+        total_path = [(cs, current)] + total_path
+        if current not in camefrom.keys():
+            break
+        (cs, current) = camefrom[current]
+    return total_path
+
+def astar(start, verifygoal, neighbors, h, compute_path=False):
+
+    openset = []
+
+    heappush(openset, (0, start))
+
+    camefrom = {}
+
+    gscore = defaultdict(lambda: math.inf)
+    gscore[start] = 0
+
+    i = 0
+    while len(openset) > 0:
+        c = heappop(openset)
+        (cfscore, cnode) = c
+        if verifygoal(cnode):
+            return (cfscore, astar_path(camefrom, c))
+        
+        cgscore = gscore[cnode]
+        for (dnext, next) in neighbors(cnode):
+            tentative_gScore = cgscore + dnext
+            if tentative_gScore < gscore[next]:
+                if compute_path:
+                    camefrom[next] = (cgscore, cnode)
+                gscore[next] = tentative_gScore
+                heappush(openset, (tentative_gScore + h(next), next))
+
+    raise "Failure to compute A*"
+
